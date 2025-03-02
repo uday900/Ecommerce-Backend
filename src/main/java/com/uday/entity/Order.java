@@ -3,6 +3,8 @@ package com.uday.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.uday.enums.OrderStatus;
 
 import jakarta.persistence.*;
@@ -22,6 +24,8 @@ public class Order {
     
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
+//    @JsonIgnore
     private User user;
     
     @ManyToOne

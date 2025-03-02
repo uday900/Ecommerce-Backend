@@ -2,16 +2,19 @@
 	
 	import java.util.List;
 	import java.util.stream.Collectors;
-	
-	import org.springframework.stereotype.Service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 	
 	import com.uday.Dto.CategoryDto;
 	import com.uday.Dto.Response;
 	import com.uday.entity.Category;
-	import com.uday.mapper.EntityAndDtoMapper;
+import com.uday.entity.Product;
+import com.uday.mapper.EntityAndDtoMapper;
 	import com.uday.repository.CategoryRepository;
-	
-	import lombok.RequiredArgsConstructor;
+import com.uday.repository.ProductRepository;
+
+import lombok.RequiredArgsConstructor;
 	
 	@Service
 	@RequiredArgsConstructor
@@ -19,6 +22,9 @@
 	
 		private final CategoryRepository categoryRepository;
 		private final EntityAndDtoMapper entityAndDto;
+		
+		@Autowired
+		private ProductRepository productRepository;
 		
 		//update category
 		
@@ -56,6 +62,13 @@
 				return Response.builder().status(404).message("Category not found").build();
 			}
 	
+//			List<Product> products = category.getProducts();
+//			
+//			if (!products.isEmpty()) {
+//				System.out.println("this category has products to be delete");
+//				productRepository.deleteByCategoryId(category.getId());
+//				
+//			}
 			categoryRepository.delete(category);
 	
 			return Response.builder()

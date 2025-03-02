@@ -3,6 +3,8 @@ package com.uday.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.uday.enums.UserRole;
 
 import jakarta.persistence.*;
@@ -41,7 +43,9 @@ public class User {
 	
 	private LocalDateTime resetPasswordExpires;
 	
-	@OneToMany(mappedBy = "user")
-	private List<Order> orders;
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//	@JsonManagedReference
+//	private List<Order> orders;
 	
 }

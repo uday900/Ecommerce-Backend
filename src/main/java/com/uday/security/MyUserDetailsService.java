@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.uday.entity.User;
+import com.uday.exception_handling.NotFoundException;
 import com.uday.repository.UserRepository;
 
 
@@ -19,7 +20,7 @@ public class MyUserDetailsService implements UserDetailsService{
 	private UserRepository repository;
 	
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) {
 		
 //		System.out.println("in custom function "+ username);
 		
@@ -27,7 +28,8 @@ public class MyUserDetailsService implements UserDetailsService{
 
 		if ( user == null ) {
 			System.out.println("user not found ");
-			throw new UsernameNotFoundException("user not found "+ username);
+//			throw new UsernameNotFoundException("user not found "+ username);
+			throw new NotFoundException("user not found with "+ username);
 		}
 		
 //		User user = userOpt.get();

@@ -32,7 +32,7 @@ public class UserPrincipal implements UserDetails {
 	    Set<SimpleGrantedAuthority> authorities = new HashSet<>();
 
 	    if (user.getRole() == UserRole.ADMIN) {
-	        System.out.println("Added role of admin");
+//	        System.out.println("Added role of admin");
 	        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN")); 
 	    }
 	    

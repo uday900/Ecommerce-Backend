@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import com.uday.Dto.Response;
 import com.uday.Dto.UserDto;
 import com.uday.entity.*;
 import com.uday.enums.UserRole;
+import com.uday.exception_handling.NotFoundException;
 import com.uday.mapper.EntityAndDtoMapper;
 import com.uday.repository.*;
 import com.uday.security.JWTService;
@@ -42,32 +44,39 @@ public class UserService {
 	
 	@Autowired
 	private JWTService jwtService;
+	
+	@Value("${frontend.url}")
+	private String frontEndUrl;
 
 	// reset password
 	public Response resetPassword(String email, String newPassword, String token) {
 
 		User user = userRepository.findByEmail(email);
-		if (user == null) {
-			return Response.builder().status(404).message("user not found").build();
-		}
+		if (user == null) throw new NotFoundException("user not found with "+ email);
+//			return Response.builder().status(404).message("user not found").build();
+//		}
 
 		if (user.getResetPasswordToken().equals(token) && user.getResetPasswordExpires().isAfter(LocalDateTime.now())) {
-			user.setPassword(newPassword);
+			user.setPassword(new BCryptPasswordEncoder(12).encode(newPassword));
+			
+			
+			// new BCryptPasswordEncoder(12).encode(userDto.getPassword())
+			userRepository.save(user);
+			
 			return Response.builder().status(200).message("password updated succesfully").build();
 		}
 
-		return Response.builder().status(404).message("token miss match/expires").build();
+		throw new RuntimeException("token miss match/expires"); //.builder().status(404).message("token miss match/expires").build();
 	}
 
 	// forgot password
 	public Response forgotPassword(String email) {
 		System.out.println("this is user mail " + email);
-		String frontEndUrl = "";
 
 		User user = userRepository.findByEmail(email);
 		System.out.println(user);
 		if (user == null) {
-			return Response.builder().status(404).message("user not found").build();
+			throw new NotFoundException("user not found with "+email);
 		}
 
 		String token = UUID.randomUUID().toString();
@@ -75,9 +84,11 @@ public class UserService {
 		user.setResetPasswordToken(token);
 		user.setResetPasswordExpires(LocalDateTime.now().plusMinutes(5));
 
+		System.out.println("saved token in db");
 		userRepository.save(user);
+		System.out.println("saved token in db");
 
-		String body = "Resent your password. " + "Link is active for 5 min only " + frontEndUrl + "?token=" + token
+		String body = "Resent your password. " + "Link is active for 5 min only " + frontEndUrl +"/reset-password" + "?token=" + token
 				+ "&username=" + email;
 
 		emailService.sendEmail(email, "Reset your password", body);
@@ -130,13 +141,21 @@ public class UserService {
 
 	// get user by id
 	public Response getUserById(Long userId) {
-		User user = userRepository.findById(userId).orElse(null);
-		if (user == null) {
-			return Response.builder().status(400).message("User not found").build();
-		}
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new NotFoundException("user not found with id "+userId));
+//				.orElse(null);
+		
+//		User = user.get();
+//		if (user == null) {
+//			return Response.builder().status(400).message("User not found").build();
+//		}
 
-		UserDto userDto = UserDto.builder().id(user.getId()).email(user.getEmail()).name(user.getName())
-				.phoneNumber(user.getPhoneNumber()).address(user.getAddress())
+		UserDto userDto = UserDto.builder()
+				.id(user.getId())
+				.email(user.getEmail())
+				.name(user.getName())
+				.phoneNumber(user.getPhoneNumber())
+				.address(user.getAddress())
 //				.password(user.getPassword())
 
 				.build();

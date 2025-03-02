@@ -3,10 +3,13 @@ package com.uday.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.uday.entity.Product;
+
+import jakarta.transaction.Transactional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 	
@@ -26,6 +29,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 		       "LOWER(p.category.name) LIKE LOWER(CONCAT('%', :searchValue, '%')) OR " +  // Fixed missing OR
 		       "LOWER(p.brand) LIKE LOWER(CONCAT('%', :searchValue, '%'))")  
 		List<Product> searchProducts(@Param("searchValue") String searchValue);
+
+	@Transactional
+	@Modifying
+	@Query("delete from Product p where p.category.id = :categoryId")
+	void deleteByCategoryId(@Param("categoryId") Long categoryId);
 
 
 }
