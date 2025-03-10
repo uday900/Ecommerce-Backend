@@ -13,10 +13,9 @@ public class GlobalException {
 	@ExceptionHandler(NotFoundException.class)
 	ResponseEntity<Response> notFoundException(NotFoundException msg){
 		Response res = new Response();
-		res.setStatus(401);
-		res.setMessage(msg.toString());
+		res.setStatus(404);
+		res.setMessage(msg.getMessage());
 		return ResponseEntity.ok(res);
-//		<>(msg.getMessage(), HttpStatus.NOT_FOUND);
 	}
 	
 	
@@ -24,7 +23,7 @@ public class GlobalException {
 	ResponseEntity<Response> handleGlobalExceptions(Exception msg){
 		Response res = new Response();
 		res.setStatus(401);
-		res.setMessage(msg.toString());
+		res.setMessage(msg.getMessage());
 		return ResponseEntity.ok(res);
 		
 //		return new ResponseEntity<>(msg.getMessage(), HttpStatus.BAD_REQUEST);

@@ -113,7 +113,7 @@ public class JWTService {
 		
 	}
 	
-	private boolean isTokenExpire(String token) {
+	public boolean isTokenExpire(String token) {
 		
 		return extractExpiration(token).before(new Date());
 		

@@ -1,13 +1,16 @@
 package com.uday.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +19,11 @@ import com.uday.Dto.CartDto;
 import com.uday.Dto.CartItemDTO;
 import com.uday.Dto.Response;
 import com.uday.Dto.UserDto;
+import com.uday.service.TokenBlacklistService;
 import com.uday.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,6 +33,9 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 	
 	private final UserService userService;
+	
+	@Autowired
+    private TokenBlacklistService tokenBlacklistService;
 	
 	
 	
@@ -108,7 +117,22 @@ public class UserController {
 	
 	
 	
-	
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+		
+		if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // Remove "Bearer " prefix
+		} else {
+			return ResponseEntity.badRequest().body("Invalid token");
+		}
+		
+		tokenBlacklistService.addToBlacklist(token);
+		SecurityContextHolder.clearContext();
+        return ResponseEntity.ok("User logged out successfully.");
+		
+		
+	}	
+
 	
 	
 	

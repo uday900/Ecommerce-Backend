@@ -12,6 +12,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.uday.service.TokenBlacklistService;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +27,9 @@ public class JWTFilter extends OncePerRequestFilter{
 	
 	@Autowired
 	ApplicationContext applicationContext;
+	
+	@Autowired
+	private TokenBlacklistService tokenBlacklistService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -39,7 +44,16 @@ public class JWTFilter extends OncePerRequestFilter{
 		if ( authHeader != null && authHeader.startsWith("Bearer ")) {
 			
 			token = authHeader.substring(7);
+			
+			// Check if token is blacklisted
+            if (tokenBlacklistService.isBlacklisted(token)) {
+            	throw new RuntimeException("Token has been invalidated.");
+            }
+            
+            
+            
 			username = jwtService.extractUserName(token);
+			
 			
 			
 		}
@@ -57,7 +71,7 @@ public class JWTFilter extends OncePerRequestFilter{
 						.buildDetails(request));
 				
 				SecurityContextHolder.getContext().setAuthentication(authToken);
-			}
+			} 
 			
 		}
 		filterChain.doFilter(request, response);

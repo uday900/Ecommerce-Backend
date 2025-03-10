@@ -33,7 +33,7 @@ public class Response {
 	private List<CartDto> cartItems;
 	private Double totalAmount;
 	
-	private int cartCount;
+	private Integer cartCount;
 	
 	private UserDto user;
 	private List<UserDto> users;

@@ -3,6 +3,7 @@ package com.uday.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.uday.Dto.CartDto;
@@ -45,6 +47,9 @@ public class UserService {
 	@Autowired
 	private JWTService jwtService;
 	
+	@Autowired
+	private TokenBlacklistService tokenBlacklistService;
+	
 	@Value("${frontend.url}")
 	private String frontEndUrl;
 
@@ -55,10 +60,16 @@ public class UserService {
 		if (user == null) throw new NotFoundException("user not found with "+ email);
 //			return Response.builder().status(404).message("user not found").build();
 //		}
-
-		if (user.getResetPasswordToken().equals(token) && user.getResetPasswordExpires().isAfter(LocalDateTime.now())) {
+		
+		System.out.println(user.getResetPasswordToken() + " " + token);
+		System.out.println(user.getResetPasswordExpires() + " " + LocalDateTime.now());
+		if (
+				user.getResetPasswordToken().equals(token) && 
+				user.getResetPasswordExpires().isAfter(LocalDateTime.now())
+			) {
 			user.setPassword(new BCryptPasswordEncoder(12).encode(newPassword));
-			
+			user.setResetPasswordToken(null);
+			user.setResetPasswordExpires(null);
 			
 			// new BCryptPasswordEncoder(12).encode(userDto.getPassword())
 			userRepository.save(user);
@@ -71,15 +82,23 @@ public class UserService {
 
 	// forgot password
 	public Response forgotPassword(String email) {
-		System.out.println("this is user mail " + email);
+//		System.out.println("this is user mail " + email);
 
 		User user = userRepository.findByEmail(email);
-		System.out.println(user);
+//		System.out.println(user);
 		if (user == null) {
 			throw new NotFoundException("user not found with "+email);
 		}
 
-		String token = UUID.randomUUID().toString();
+		// generate a token and save it in db
+//		String DIGITS = "0123456789";
+		StringBuilder otp = new StringBuilder();
+		Random random = new Random();
+		
+		for (int i = 0; i < 6; i++) otp.append( random.nextInt(9));
+		
+		
+		String token = otp.toString(); //UUID.randomUUID().toString();
 		
 		user.setResetPasswordToken(token);
 		user.setResetPasswordExpires(LocalDateTime.now().plusMinutes(5));
@@ -88,12 +107,22 @@ public class UserService {
 		userRepository.save(user);
 		System.out.println("saved token in db");
 
+		String content = "Your OTP Code: " + otp
+				+ "\nUse the following One-Time Password (OTP) to verify your account: " + otp + ""
+				+ "\nThis OTP is valid for only 5 minutes. Do not share it with anyone."
+				+ "\nIf you did not request this OTP, please ignore this email."
+				+ "\n\nBest Regards,\nDarla Dass";
+		
+
+		
+		
 		String body = "Resent your password. " + "Link is active for 5 min only " + frontEndUrl +"/reset-password" + "?token=" + token
 				+ "&username=" + email;
+		String subject = "Your OTP Code";
 
-		emailService.sendEmail(email, "Reset your password", body);
+		emailService.sendEmail(email, subject, content);
 
-		return Response.builder().status(200).message("password sent to " + email).build();
+		return Response.builder().status(200).message("OTP sent to " + email).build();
 	}
 
 	// remove item from cart
@@ -329,21 +358,22 @@ public class UserService {
 
 		System.out.println("validating user............ " + loginRequest.getEmail());
 
+		User user = userRepository.findByEmail(loginRequest.getEmail());
+		if (user == null) throw new NotFoundException("user not found with "+loginRequest.getEmail());
+		
+		
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
-		Boolean isAuthenticated = authentication.isAuthenticated();
+		
 
-		if (isAuthenticated) {
+		if (authentication.isAuthenticated()) {
 
 			// if user authenticated generate a JWT token
 			String token = jwtService.generateToken(loginRequest.getEmail());
 
 			if (token != null) {
-				User user = userRepository.findByEmail(loginRequest.getEmail());
-				if (user == null) {
-					return Response.builder().status(400).message("User not found").build();
-				}
+				
 				UserDto userDto = UserDto.builder()
 						.id(user.getId())
 						.email(user.getEmail())
@@ -357,6 +387,9 @@ public class UserService {
 						.build();
 				
 				System.out.println("verified user");
+				
+				// set authentication in security context
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 				return Response.builder()
 						.status(200)
 						.token(token)
@@ -365,21 +398,68 @@ public class UserService {
 						.message("Login successfully")
 						.build();
 			}
-			return  Response.builder()
-					
-					.status(400)
-					.message("failed to generated token")
-					.build();
+			
 //			new ResponseEntity<>("failed to generated token", HttpStatus.BAD_REQUEST);
 		}
 
 
 		return Response.builder()
 				.status(400)
-				.message("user not found/password miss match")
+				.message("user not found/invalid credentials")
 				.build();
-//		return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
 		
+	}
+
+	public Response verifyAccount(String token) {
+		
+		// check the token is in black list 
+		System.out.println("verifcation ..");
+		
+		String username = jwtService.extractUserName(token);
+		
+		User user = userRepository.findByEmail(username);
+		if (user == null) {
+			throw new NotFoundException("user not found with " + username);
+		}
+		
+		
+		if (tokenBlacklistService.isBlacklisted(token) || jwtService.isTokenExpire(token)) {
+			System.out.println("Invalidate bro");
+        	throw new RuntimeException("Token has been invalidated/expires.");
+        }
+//		
+//		if (jwtService.isTokenExpire(token)) {
+//			throw new RuntimeException("token expired");
+//        }
+		
+		return Response.builder().status(200).message("account verified").build();
+	}
+
+	public Response verifyOtp(String otp, String email) {
+		
+		User user = userRepository.findByEmail(email);
+		if (user == null) {
+			throw new NotFoundException("user not found with " + email);
+		}
+		
+		// check if otp is valid
+		if (user.getResetPasswordExpires().isAfter(LocalDateTime.now()) &&
+				user.getResetPasswordToken().equals(otp)) {
+			// set new token and expires
+			String token = UUID.randomUUID().toString();
+			user.setResetPasswordToken(token);
+			user.setResetPasswordExpires(LocalDateTime.now().plusMinutes(5));
+			
+			userRepository.save(user);
+			
+			return Response.builder()
+					.status(200)
+					.message("Verified OTP successfully, now you can reset your password within 5 minutes")
+					.token(token)
+					.build();
+		}
+		
+		return Response.builder().status(400).message("OTP miss match/expired").build();
 	}
 
 }
