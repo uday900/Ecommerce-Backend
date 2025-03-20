@@ -49,5 +49,11 @@ public class Response {
 	
 	private String token;
 	
+	private String error;
+	
+	private List<ReviewDto> reviews;
+	
+	private ReviewDto review;
+	
 	
 }

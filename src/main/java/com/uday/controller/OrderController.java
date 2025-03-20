@@ -65,6 +65,7 @@ public class OrderController {
 	public ResponseEntity<Response> updateOrderStatus(
 			@PathVariable Long orderId,
 			@RequestParam OrderStatus status){
+		System.out.println(status);
 		return ResponseEntity.ok(orderService.updateOrderStatus(orderId, status));
 	}
 	

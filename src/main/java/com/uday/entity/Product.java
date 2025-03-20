@@ -3,6 +3,7 @@ package com.uday.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -50,6 +51,8 @@ public class Product {
 	private String imageName;
 	
 	@Lob
+//	@Column(columnDefinition = "BYTEA") // for postgres
+//	@Basic(fetch = FetchType.LAZY) // for postgres
 	private byte[] imageData;
 	
 	private String imageUrl;

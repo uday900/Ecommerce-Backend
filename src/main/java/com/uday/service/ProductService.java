@@ -213,11 +213,11 @@ public Response updateProduct(Long productId, ProductDto productDto, MultipartFi
 		// delte image from drive
 		String imageUrl = product.getImageUrl();
 		
-		ImageResponse imageResponse =  imageService.deleteImageFromDrive( imageService.extractDriveId(imageUrl));
+//		ImageResponse imageResponse =  imageService.deleteImageFromDrive( imageService.extractDriveId(imageUrl));
 		
-		if (imageResponse.getStatus() != 200) {
-			return Response.builder().status(400).message("Image is not deleted from drive").build();
-		}
+//		if (imageResponse.getStatus() != 200) {
+//			return Response.builder().status(400).message("Image is not deleted from drive").build();
+//		}
 		// first delete from product in category
 		Category category = categoryRepository.findByName(product.getCategory().getName());
 		

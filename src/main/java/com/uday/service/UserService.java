@@ -164,6 +164,9 @@ public class UserService {
 
 		List<UserDto> users = userRepository.findAll().stream().map(entiyAndDtoMapper::mapToUserDto)
 				.collect(Collectors.toList());
+		// exclude admin
+		users = users.stream().filter(user -> user.getRole() != UserRole.ADMIN).collect(Collectors.toList());
+		
 		return Response.builder().status(200).users(users).build();
 
 	}
@@ -445,6 +448,7 @@ public class UserService {
 		// check if otp is valid
 		if (user.getResetPasswordExpires().isAfter(LocalDateTime.now()) &&
 				user.getResetPasswordToken().equals(otp)) {
+			
 			// set new token and expires
 			String token = UUID.randomUUID().toString();
 			user.setResetPasswordToken(token);

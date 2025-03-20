@@ -46,25 +46,6 @@ public class EntityAndDtoMapper {
 	}
 	
 	
-	// map to cart
-//	public CartDto mapToCartDto(Cart cart) {
-//		return CartDto.builder().id(cart.getId()).quantity(cart.getQuantity())
-//				.product(mapToProductDto(cart.getProduct())).build();
-//	}	
-	
-	
-	// map to cartDto
-//	public CartDto mapToCartDto(Cart cart) {
-//		return CartDto.builder()
-//				.id(cart.getId())
-//				.userId(cart.getUser().getId())
-//				.quantity(cart.getQuantity())
-//				.product(mapToProductDto(cart.getProduct()))
-//				.build();
-//	}
-	
-	// map to Cart
-	
 	public Product mapToProduct(ProductDto productDto) {
 		Product product = new Product();
 		
@@ -98,8 +79,18 @@ public class EntityAndDtoMapper {
 		productDto.setPrice(product.getPrice());
 		productDto.setDescription(product.getDescription());
 		
-		productDto.setColors( Arrays.asList(product.getColors().split(",")));
-		productDto.setSizes(Arrays.asList(product.getSizes().split(",")));
+		String colorsStr = product.getColors();
+		List<String> colors = (colorsStr == null || colorsStr.isEmpty()) ? null
+				: Arrays.asList(colorsStr.split(","));
+
+//		productDto.setColors( 	Arrays.asList(product.getColors().split(",")));
+		productDto.setColors(colors);
+		
+		String sizesStr = product.getSizes();
+		List<String> sizes = (sizesStr == null || sizesStr.isEmpty()) ? null
+				: Arrays.asList(sizesStr.split(","));
+//		productDto.setSizes(Arrays.asList(product.getSizes().split(",")));
+		productDto.setSizes(sizes);
 		
 		productDto.setBrand(product.getBrand());
 		productDto.setRating(product.getRating());

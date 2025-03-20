@@ -22,7 +22,7 @@ public class GlobalException {
 	@ExceptionHandler(Exception.class)
 	ResponseEntity<Response> handleGlobalExceptions(Exception msg){
 		Response res = new Response();
-		res.setStatus(401);
+		res.setStatus(404);
 		res.setMessage(msg.getMessage());
 		return ResponseEntity.ok(res);
 		

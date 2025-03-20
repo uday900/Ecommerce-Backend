@@ -90,20 +90,21 @@ public class JWTService {
 	}
 	
 	private Claims extractAllClaims(String token) {
-		return Jwts.parser()
-				.verifyWith(getKey())
-				.build()
-				.parseSignedClaims(token)
-				.getPayload();
+		
+		try {
+			return Jwts.parser()
+					.verifyWith(getKey())
+					.build()
+					.parseSignedClaims(token)
+					.getPayload();
+		} catch (Exception e) {
+			throw new RuntimeException("Invalid or expired token. Please log in again.");
+		}
+		
 				
 				
 				
 	}
-	
-
-
-	
-
 
 	public boolean isValidToken(UserDetails userDetails, String token) {
 		// TODO Auto-generated method stub

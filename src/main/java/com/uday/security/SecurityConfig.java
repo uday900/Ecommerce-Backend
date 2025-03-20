@@ -47,7 +47,8 @@ public class SecurityConfig {
 						.requestMatchers("public/**","auth/**",
 								"/carousels/fetch",
 								"/category/fetch/**", //"/categories/fetch/{categoryId}",
-								"/products/fetch/**"
+								"/products/fetch/**",
+								"/product/reviews/**"
 								
 								).permitAll()
 //		                .requestMatchers("/carousels/**" ).hasRole("ADMIN")  //, "/carousels/delete/**").hasRole("ADMIN") // Restricted to ADMIN
