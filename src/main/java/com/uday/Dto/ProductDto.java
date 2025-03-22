@@ -28,4 +28,6 @@ public class ProductDto {
 	private String imageName;
 	private byte[] imageData;
 	
+	private String imageDataBase64; // Base64-encoded string
+	
 }

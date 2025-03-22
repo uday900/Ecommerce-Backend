@@ -1,6 +1,7 @@
 package com.uday.entity;
 
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Basic;
@@ -50,10 +51,10 @@ public class Product {
 	
 	private String imageName;
 	
-	@Lob
-//	@Column(columnDefinition = "BYTEA") // for postgres
-//	@Basic(fetch = FetchType.LAZY) // for postgres
-	private byte[] imageData;
+	 @Lob
+//	    @Column(columnDefinition = "BYTEA") // for postgresql
+	    @Basic(fetch = FetchType.LAZY) // for postgresql
+	    private byte[] imageData;
 	
 	private String imageUrl;
 

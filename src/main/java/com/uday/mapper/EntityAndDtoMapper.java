@@ -1,6 +1,7 @@
 package com.uday.mapper;
 
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,7 @@ public class EntityAndDtoMapper {
 				.email(user.getEmail())
 				.phoneNumber(user.getPhoneNumber())
 				.address(user.getAddress())
+				.role(user.getRole())
 		
 				.build();
 	}
@@ -100,6 +102,8 @@ public class EntityAndDtoMapper {
 		productDto.setImageUrl(product.getImageUrl());
 		productDto.setImageName(product.getImageName());
 		productDto.setImageData(product.getImageData());
+		
+		productDto.setImageDataBase64(Base64.getEncoder().encodeToString(product.getImageData()));
 		
 		return productDto;
 	

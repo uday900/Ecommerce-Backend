@@ -162,10 +162,12 @@ public class UserService {
 	// get all users
 	public Response getAllUsers() {
 
-		List<UserDto> users = userRepository.findAll().stream().map(entiyAndDtoMapper::mapToUserDto)
+		List<UserDto> users = userRepository.findAll().stream()
+				.map(entiyAndDtoMapper::mapToUserDto)
+				.filter(user -> user.getRole() != UserRole.ADMIN)
 				.collect(Collectors.toList());
 		// exclude admin
-		users = users.stream().filter(user -> user.getRole() != UserRole.ADMIN).collect(Collectors.toList());
+//		users = users.stream().filter(user -> user.getRole() != UserRole.ADMIN).collect(Collectors.toList());
 		
 		return Response.builder().status(200).users(users).build();
 

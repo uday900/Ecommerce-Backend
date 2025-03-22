@@ -15,6 +15,7 @@ import com.uday.entity.*;
 import com.uday.mapper.EntityAndDtoMapper;
 import com.uday.repository.*;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,6 +28,7 @@ public class ProductService {
 	private final ImageStorageToDriveService imageService;
 	
 	// get products by category
+	@Transactional
 	public Response getProductsByCategory(String categoryName) {
         // check the category is present or not
 		        Category category = categoryRepository.findByName(categoryName);
@@ -53,7 +55,7 @@ public class ProductService {
 		return Response.builder().status(200).message("All products").products(productList).build();
 	}
 	
-	
+	@Transactional
 	public Response createProduct(ProductDto productDto, MultipartFile image) throws IOException, GeneralSecurityException {
 		
 		// check the category is present or not
@@ -65,24 +67,11 @@ public class ProductService {
 	                .build();
 		}
 		
-//		File imageFile = File.createTempFile("product_image", null);
-//		image.transferTo(imageFile);
-//		
-//		ImageResponse imageResponse = imageService.uploadImageToDrive(imageFile);
-//		
-//		if (imageResponse.getStatus() == 200) {
-//	        // If upload is successful, get the image URL from the response
-//	        String imageUrl = imageResponse.getUrl();
-//
-//	        // Set the image details in the productDTO
-////	        product.setImageName(image.getOriginalFilename());
-//	        
-//	        productDto.setImageUrl(imageUrl);
-	        
-	       
-	        
-
-	        // Save the product to the database
+		
+		if (image.isEmpty() || image == null) {
+            throw new RuntimeException("Image is not selected");
+		}
+		
 	        Product newProduct = entityAndDtoMapper.mapToProduct(productDto);
 	        // setting image data:
 	        
@@ -94,13 +83,6 @@ public class ProductService {
 	        productRepository.save(newProduct);
 	        	        
 	        System.out.println("Product created successfully");
-//	    } else {
-//	        // If image upload failed, return a failure response
-//	    	return Response.builder()
-//	                .status(400)
-//	                .message("Image upload faild")
-//	                .build();
-//	    }
 		
 		return Response.builder()
 				.status(200)
