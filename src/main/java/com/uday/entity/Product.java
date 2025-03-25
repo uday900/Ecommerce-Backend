@@ -53,7 +53,7 @@ public class Product {
 	
 	 @Lob
 //	    @Column(columnDefinition = "BYTEA") // for postgresql
-	    @Basic(fetch = FetchType.LAZY) // for postgresql
+	    @Basic(fetch = FetchType.EAGER) // for postgresql
 	    private byte[] imageData;
 	
 	private String imageUrl;

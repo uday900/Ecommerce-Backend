@@ -14,6 +14,8 @@ import javax.crypto.SecretKey;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.uday.exception_handling.InvalidSessionOrToken;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -98,7 +100,7 @@ public class JWTService {
 					.parseSignedClaims(token)
 					.getPayload();
 		} catch (Exception e) {
-			throw new RuntimeException("Invalid or expired token. Please log in again.");
+			throw new InvalidSessionOrToken("Invalid or expired token. Please log in again.");
 		}
 		
 				

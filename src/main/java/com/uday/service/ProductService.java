@@ -45,6 +45,7 @@ public class ProductService {
 	}
 
 	// products by seach keyword
+	@Transactional
 	public Response getProductsBySearchKeyword(String searchValue) {
 		
 		List<ProductDto> productList = productRepository.searchProducts(searchValue)
@@ -90,6 +91,7 @@ public class ProductService {
 				.build();
 	}
 	
+	@Transactional
 	public Response getProductById(Long productId) {
 		Product existingProduct = productRepository.findById(productId).orElse(null);
 		if (existingProduct == null) {
@@ -102,6 +104,7 @@ public class ProductService {
 		return Response.builder().status(200).message("Product found").product(productDto).build();
 	}
 	
+	@Transactional
 	public Response getAllProducts() {
 		List<ProductDto> productList = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
                 .stream()
@@ -115,6 +118,7 @@ public class ProductService {
 				.build();
 	}
 	// update product
+	@Transactional
 public Response updateProduct(Long productId, ProductDto productDto, MultipartFile image) throws IOException, GeneralSecurityException {
 		
 		Product existingProduct = productRepository.findById(productId).orElse(null);
@@ -185,6 +189,7 @@ public Response updateProduct(Long productId, ProductDto productDto, MultipartFi
 
 
 	// delete product
+	@Transactional
 	public Response deleteProduct(Long productId) throws GeneralSecurityException, IOException {
 		// check the product is present or not
 		Product product = productRepository.findById(productId).orElse(null);
@@ -218,45 +223,5 @@ public Response updateProduct(Long productId, ProductDto productDto, MultipartFi
 		return Response.builder().status(200).message("Product deleted successfully").build();
 	}
 
-	public Response testImageUpload(MultipartFile image) throws IOException, GeneralSecurityException {
-		// TODO Auto-generated method stub
-		
-		File imageFile = File.createTempFile("product_image", null);
-		image.transferTo(imageFile);
-		
-		ImageResponse imageResponse = imageService.uploadImageToDrive(imageFile);
-		
-		if (imageResponse.getStatus() == 200) {
-	        // If upload is successful, get the image URL from the response
-	        String imageUrl = imageResponse.getUrl();
-
-	        System.out.println("Image uploaded successfully" + imageUrl);
-	        // Set the image details in the productDTO
-//	        product.setImageName(image.getOriginalFilename());
-	        
-//	        productDto.setImageUrl(imageUrl);
-
-	        // Save the product to the database
-//	        Product newProduct = entityAndDtoMapper.mapToProduct(productDto);
-//	        
-//	        newProduct.setCategory(category);
-//	        
-//	        productRepository.save(
-//	        		newProduct
-//	        		);
-	        	        
-//	        System.out.println("Product created successfully");
-	    } else {
-	        // If image upload failed, return a failure response
-	    	return Response.builder()
-	                .status(400)
-	                .message("Image upload faild")
-	                .build();
-	    }
-		
-		return Response.builder()
-                .status(200)
-                .message("Product created successfully")
-                .build();
-	}
+	
 }

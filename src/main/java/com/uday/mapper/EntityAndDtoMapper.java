@@ -102,6 +102,7 @@ public class EntityAndDtoMapper {
 		productDto.setImageUrl(product.getImageUrl());
 		productDto.setImageName(product.getImageName());
 		productDto.setImageData(product.getImageData());
+		productDto.setCreatedAt(product.getCreatedAt());
 		
 		productDto.setImageDataBase64(Base64.getEncoder().encodeToString(product.getImageData()));
 		

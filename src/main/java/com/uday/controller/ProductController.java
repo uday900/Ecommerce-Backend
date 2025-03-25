@@ -78,12 +78,7 @@ public class ProductController {
 		return ResponseEntity.ok(productService.getAllProducts());
 	}
 	
-	// test image upload
-	@PostMapping("/test")
-	public ResponseEntity<Response> testImageUpload(@RequestParam("image") MultipartFile image)
-			throws IOException, GeneralSecurityException {
-		return ResponseEntity.ok(productService.testImageUpload(image));
-	}
+
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/add")

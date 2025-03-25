@@ -8,6 +8,8 @@ import com.uday.entity.Review;
 import com.uday.exception_handling.NotFoundException;
 import com.uday.repository.*;
 
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -104,7 +106,8 @@ public class ReviewService {
 		return reviewDto;
     }
 
-    public void deleteReview(Long id, Long userId) {
+    @Transactional
+    public String deleteReview(Long id, Long userId) {
     	userRepository.findById(userId)
 				.orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
     	
@@ -129,5 +132,7 @@ public class ReviewService {
     	
     	
         reviewRepository.deleteById(id);
+        
+        return "Review deleted successfully!";
     }
 }

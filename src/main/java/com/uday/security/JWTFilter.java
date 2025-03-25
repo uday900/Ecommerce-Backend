@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.uday.exception_handling.InvalidSessionOrToken;
 import com.uday.service.TokenBlacklistService;
 
 import jakarta.servlet.FilterChain;
@@ -51,8 +52,13 @@ public class JWTFilter extends OncePerRequestFilter{
             }
             
             
-            
-			username = jwtService.extractUserName(token);
+            try {
+                
+            	username = jwtService.extractUserName(token);
+            } catch (InvalidSessionOrToken e) {
+            	
+                throw e; // Ensure Spring's global exception handler catches it
+            }
 			
 			
 			
@@ -72,7 +78,7 @@ public class JWTFilter extends OncePerRequestFilter{
 				
 				SecurityContextHolder.getContext().setAuthentication(authToken);
 			} else {
-				throw new RuntimeException("Invalid or expired token. Please log in again.");
+				throw new InvalidSessionOrToken("Invalid or expired token. Please log in again.");
 			}	
 			
 		}

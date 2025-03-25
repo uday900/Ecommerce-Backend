@@ -13,7 +13,8 @@ import jakarta.transaction.Transactional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 	
-	List<Product> findByCategoryId(Long categoryId);
+	@Query("select p from Product p where p.category.id = :categoryId")
+	List<Product> findByCategoryId(@Param("categoryId") Long categoryId);
 
 //	@Query("select product from Product p where " + 
 //			"lower(p.name) like lower(concat('%', :searchValue, '%')) or " + 

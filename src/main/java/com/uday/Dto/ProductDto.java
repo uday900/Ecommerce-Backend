@@ -1,5 +1,6 @@
 package com.uday.Dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -29,5 +30,7 @@ public class ProductDto {
 	private byte[] imageData;
 	
 	private String imageDataBase64; // Base64-encoded string
+	
+	private LocalDateTime createdAt;
 	
 }

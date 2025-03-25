@@ -26,6 +26,7 @@ import com.uday.mapper.EntityAndDtoMapper;
 import com.uday.repository.*;
 import com.uday.security.JWTService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -198,6 +199,7 @@ public class UserService {
 	}
 
 	// get user cart items
+	@Transactional
 	public Response getUserCart(Long userId) {
 
 		// check if there is a cart for user
@@ -313,6 +315,7 @@ public class UserService {
 				.build();
 	}
 
+	@Transactional
 	public Response getCartCount(Long userId) {
 		// TODO Auto-generated method stub
 		Cart cart = cartRepository.findByUserId(userId);

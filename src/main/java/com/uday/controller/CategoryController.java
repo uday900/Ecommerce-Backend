@@ -31,6 +31,7 @@ public class CategoryController {
 
 	@GetMapping("/fetch")
 	public ResponseEntity<Response> fetchCategories() {
+		System.out.println("categories fetching lol at 22nd march 2025");
 		return ResponseEntity.ok(categoryService.fetchCategories());
 	}
 	

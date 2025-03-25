@@ -1,14 +1,13 @@
 package com.uday.exception_handling;
 
-public class NotFoundException extends RuntimeException{
+public class InvalidSessionOrToken extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public NotFoundException(String message) {
+	public InvalidSessionOrToken(String message) {
 		super(message);
 	}
-	
 }
