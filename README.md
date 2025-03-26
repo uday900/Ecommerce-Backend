@@ -1,7 +1,7 @@
 # DarlaMart - E-commerce Platform
 
 ## Deployment Link
-[Live Demo](https://darla-mart.netlify.app/)
+[Live Demo](https://darlamart.netlify.app/)
 
 ## Overview
 DarlaMart is a full-stack e-commerce platform built with React, Tailwind CSS, Java Spring Boot, and PostgreSQL. The platform provides both admin and user functionalities, including product management, order handling, authentication, and authorization.
